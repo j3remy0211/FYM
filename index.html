@@ -9,7 +9,7 @@
 <body>
 
     <header>
-        <h1>F&M</h1>
+        <h1>FARMACIA F&M</h1>
     </header>
 
     <div class="tabs">
@@ -19,39 +19,65 @@
 
     <div id="vender" class="content active">
         <div class="search-container">
-            <input type="text" id="buscador" placeholder="🔍 Buscar medicina..." onkeyup="filtrarProductos()">
+            <input type="text" id="buscador" placeholder="🔍 Buscar para vender..." onkeyup="filtrarVentas()">
         </div>
-        
-        <div id="lista-productos">
-            </div>
+        <div id="lista-ventas"></div>
     </div>
 
     <div id="admin" class="content">
-        <div class="card form-card">
-            <h3>➕ Nuevo Producto</h3>
-            <input type="text" id="nuevo-nombre" placeholder="Nombre del producto">
-            <div class="row">
-                <input type="number" id="nuevo-precio" placeholder="Precio C$">
-                <input type="number" id="nuevo-stock" placeholder="Cantidad">
-            </div>
-            <button onclick="agregarProducto()" class="btn-guardar">GUARDAR NUEVO</button>
+        
+        <div class="acciones-extra">
+            <button onclick="mostrarFormularioNuevo()" class="btn-guardar">➕ AGREGAR NUEVO PRODUCTO</button>
+            <button onclick="descargarPDF()" class="btn-pdf">📄 Descargar PDF</button>
         </div>
 
+        <div class="search-container">
+            <input type="text" id="buscador-admin" placeholder="🔍 Buscar para editar o corregir..." onkeyup="filtrarInventario()">
+        </div>
+
+        <div id="lista-inventario">
+            </div>
+
+        <br><hr><br>
         <div class="acciones-extra">
-            <h3>⚙️ Opciones</h3>
-            <p>Los datos se guardan en este dispositivo.</p>
-            
-            <button onclick="descargarPDF()" class="btn-pdf">📄 Descargar Inventario PDF</button>
-            <br><br>
-            
             <button onclick="descargarRespaldo()" class="btn-secundario">⬇️ Descargar Respaldo JSON</button>
             <br><br>
-            <button onclick="reiniciarFabrica()" class="btn-peligro">⚠️ Reiniciar Inventario Original</button>
+            <button onclick="reiniciarFabrica()" class="btn-peligro">⚠️ Borrar todo y Reiniciar</button>
         </div>
     </div>
 
-    <script src="script.js"></script>
+    <div id="modal-editar" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="cerrarModal()">&times;</span>
+            <h2>Editar Producto</h2>
+            <input type="hidden" id="edit-id">
+            
+            <label>Nombre:</label>
+            <input type="text" id="edit-nombre" class="input-grande">
+            
+            <label>Precio (C$):</label>
+            <input type="number" id="edit-precio" class="input-grande">
+
+            <div class="modal-buttons">
+                <button onclick="guardarEdicion()" class="btn-guardar">💾 GUARDAR CAMBIOS</button>
+                <button onclick="cerrarModal()" class="btn-secundario">CANCELAR</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="modal-nuevo" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="cerrarModalNuevo()">&times;</span>
+            <h2>Nuevo Producto</h2>
+            <input type="text" id="nuevo-nombre" placeholder="Nombre del producto" class="input-grande">
+            <input type="number" id="nuevo-precio" placeholder="Precio C$" class="input-grande">
+            <input type="number" id="nuevo-stock" placeholder="Cantidad Inicial" class="input-grande">
+            <button onclick="agregarProducto()" class="btn-guardar">GUARDAR NUEVO</button>
+        </div>
+    </div>
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
+    <script src="script.js"></script>
 </body>
 </html>

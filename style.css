@@ -1,4 +1,4 @@
-/* style.css - Versión Botones Grandes */
+/* style.css */
 
 /* --- Estilos Generales --- */
 body {
@@ -7,7 +7,6 @@ body {
     margin: 0;
     padding: 0;
     color: #333;
-    /* Evita que hagan zoom doble tap sin querer en móviles */
     touch-action: manipulation; 
 }
 
@@ -20,23 +19,23 @@ header {
 
 h1 { margin: 0; font-size: 2rem; }
 
-/* --- Pestañas (Tabs) Gigantes --- */
+/* --- Pestañas (Tabs) --- */
 .tabs {
     display: flex;
     background-color: #ecf0f1;
     border-bottom: 4px solid #bdc3c7;
+    position: sticky; top: 0; z-index: 10; /* Pegajoso al hacer scroll */
 }
 
 .tab-btn {
     flex: 1;
-    padding: 25px 10px; /* Más altos */
+    padding: 20px 10px;
     border: none;
-    background: none;
-    font-size: 1.3rem; /* Letra grande */
+    background: #ecf0f1;
+    font-size: 1.2rem;
     font-weight: bold;
     cursor: pointer;
     color: #7f8c8d;
-    transition: background 0.2s;
 }
 
 .tab-btn.active {
@@ -46,33 +45,28 @@ h1 { margin: 0; font-size: 2rem; }
 }
 
 /* --- Contenido --- */
-.content { display: none; padding: 15px; padding-bottom: 50px;}
+.content { display: none; padding: 15px; padding-bottom: 80px;}
 .content.active { display: block; }
 
-/* --- Buscador Grande --- */
-.search-container input {
+/* --- Buscador --- */
+.search-container input, .input-grande {
     width: 100%;
-    padding: 18px; /* Más espacio para escribir */
+    padding: 15px;
     font-size: 1.3rem;
     border: 3px solid #bdc3c7;
     border-radius: 10px;
     box-sizing: border-box;
-    margin-bottom: 25px;
+    margin-bottom: 15px;
 }
 
-.search-container input:focus {
-    border-color: #3498db;
-    outline: none;
-}
-
-/* --- Tarjetas de Productos --- */
+/* --- Tarjetas --- */
 .card {
     background: white;
     border-radius: 12px;
-    padding: 20px; /* Más aire interno */
-    margin-bottom: 20px;
+    padding: 15px;
+    margin-bottom: 15px;
     box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-    border-left: 8px solid #3498db; /* Borde de color más grueso */
+    border-left: 8px solid #3498db;
 }
 
 .card.poca-existencia {
@@ -84,87 +78,95 @@ h1 { margin: 0; font-size: 2rem; }
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 15px;
+    margin-bottom: 10px;
 }
 
 .nombre-prod {
-    font-size: 1.5rem; /* Nombre muy grande */
+    font-size: 1.4rem;
     font-weight: bold;
     margin: 0;
-    width: 60%;
+    width: 65%;
     line-height: 1.2;
 }
 
 .precio-prod {
-    font-size: 1.6rem;
+    font-size: 1.5rem;
     color: #27ae60;
     font-weight: bold;
 }
 
-.info-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-top: 10px;
-}
-
-.stock-info {
-    font-size: 1.3rem;
-    color: #2980b9;
-}
-
-/* --- BOTONES UNIFICADOS (CLASE MAESTRA) --- */
-/* Esto asegura que el botón de VENDER sea igual de cómodo que los de opciones */
-.btn-vender {
-    background-color: #27ae60;
-    color: white;
-    border: none;
-    padding: 15px 25px; /* Botón gordito */
-    border-radius: 8px;
-    font-size: 1.3rem; /* Letra grande */
+/* --- Botones Grandes --- */
+.btn-vender, .btn-guardar, .btn-pdf, .btn-secundario, .btn-peligro, .btn-editar {
+    width: 100%;
+    padding: 15px;
+    font-size: 1.2rem;
     font-weight: bold;
+    border: none;
+    border-radius: 8px;
     cursor: pointer;
+    color: white;
+    margin-bottom: 10px;
     box-shadow: 0 2px 4px rgba(0,0,0,0.2);
 }
 
-.btn-vender:active { transform: scale(0.98); background-color: #1e8449; }
-.btn-vender:disabled { background-color: #95a5a6; cursor: not-allowed; opacity: 0.6; }
+.btn-vender { background-color: #27ae60; }
+.btn-guardar { background-color: #2980b9; }
+.btn-pdf { background-color: #e67e22; }
+.btn-secundario { background-color: #7f8c8d; }
+.btn-peligro { background-color: #c0392b; }
+.btn-editar { background-color: #8e44ad; width: auto; padding: 10px 20px;} /* Botón morado editar */
 
-
-/* --- Estilos Admin y Botones de Opciones --- */
-.form-card input, .form-card select {
-    width: 100%;
-    padding: 15px;
-    margin-bottom: 15px;
-    font-size: 1.2rem;
-    border: 2px solid #bdc3c7;
+/* --- Controles de Stock (Inventario) --- */
+.admin-controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #f0f2f5;
+    padding: 10px;
     border-radius: 8px;
-    box-sizing: border-box;
+    margin-top: 10px;
 }
 
-/* Clase común para TODOS los botones de abajo */
-.btn-guardar, .btn-pdf, .btn-secundario, .btn-peligro {
-    width: 100%;
-    padding: 18px; /* Muy fáciles de tocar */
-    font-size: 1.3rem; /* Letra unificada grande */
+.stock-control-btn {
+    width: 50px;
+    height: 50px;
+    font-size: 1.5rem;
     font-weight: bold;
     border: none;
-    border-radius: 10px;
+    border-radius: 50%;
     cursor: pointer;
-    margin-bottom: 15px; /* Separación entre ellos */
     color: white;
-    box-shadow: 0 3px 5px rgba(0,0,0,0.1);
-    transition: background 0.2s;
 }
 
-/* Colores Específicos */
-.btn-guardar { background-color: #2980b9; } /* Azul Fuerte */
-.btn-pdf { background-color: #e67e22; }     /* Naranja */
-.btn-secundario { background-color: #7f8c8d; } /* Gris */
-.btn-peligro { background-color: #c0392b; margin-top: 10px;}   /* Rojo */
+.btn-menos { background-color: #e74c3c; }
+.btn-mas { background-color: #27ae60; }
+.stock-display { font-size: 1.5rem; font-weight: bold; color: #333; }
 
-/* Hover effects para PC */
-.btn-guardar:hover { background-color: #2471a3; }
-.btn-pdf:hover { background-color: #d35400; }
-.btn-secundario:hover { background-color: #626567; }
-.btn-peligro:hover { background-color: #a93226; }
+/* --- Modal (Ventana Emergente) --- */
+.modal {
+    display: none; 
+    position: fixed; 
+    z-index: 100; 
+    left: 0; top: 0;
+    width: 100%; height: 100%; 
+    background-color: rgba(0,0,0,0.6); /* Fondo oscuro */
+}
+
+.modal-content {
+    background-color: #fefefe;
+    margin: 15% auto; 
+    padding: 20px;
+    border: 1px solid #888;
+    width: 85%;
+    border-radius: 15px;
+}
+
+.close {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+label { font-weight: bold; display: block; margin-top: 10px;}

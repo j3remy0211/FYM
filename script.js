@@ -1,4 +1,5 @@
-// --- DATOS INICIALES (Del PDF) ---
+// --- DATOS INICIALES (Misma lista que antes, resumida para el ejemplo) ---
+// NOTA: Si ya usaste la app, los datos reales están en tu localStorage, no aquí.
 const datosIniciales = [
     { id: 1, nombre: "Acetominofén TB 500mg (20 Tab)", precio: 54.00, stock: 20 },
     { id: 2, nombre: "Acetominofén 500mg THEON (100 Tab)", precio: 82.80, stock: 10 },
@@ -30,17 +31,15 @@ const datosIniciales = [
     { id: 28, nombre: "Zorritone Caramelo", precio: 96.00, stock: 20 }
 ];
 
-// Variable global de productos
 let productos = [];
 
-// --- INICIALIZACIÓN ---
 window.onload = function() {
     cargarDatos();
-    renderizarLista(productos);
+    mostrarPestana('vender'); // Iniciar en vender
 };
 
 function cargarDatos() {
-    const guardado = localStorage.getItem('fym_inventario_v1');
+    const guardado = localStorage.getItem('fym_inventario_v3');
     if (guardado) {
         productos = JSON.parse(guardado);
     } else {
@@ -50,33 +49,46 @@ function cargarDatos() {
 }
 
 function guardarEnLocal() {
-    localStorage.setItem('fym_inventario_v1', JSON.stringify(productos));
+    localStorage.setItem('fym_inventario_v3', JSON.stringify(productos));
 }
 
-// --- RENDERIZADO (DIBUJAR EN PANTALLA) ---
-function renderizarLista(lista) {
-    const contenedor = document.getElementById('lista-productos');
-    contenedor.innerHTML = "";
+// --- PESTAÑAS ---
+function mostrarPestana(id) {
+    document.querySelectorAll('.content').forEach(div => div.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+    
+    document.getElementById(id).classList.add('active');
+    
+    // Activar visualmente el botón correcto
+    const btnIndex = id === 'vender' ? 0 : 1;
+    document.querySelectorAll('.tab-btn')[btnIndex].classList.add('active');
 
-    if (lista.length === 0) {
-        contenedor.innerHTML = "<p style='text-align:center; padding:20px;'>No se encontraron productos.</p>";
-        return;
-    }
+    if(id === 'vender') filtrarVentas();
+    if(id === 'admin') filtrarInventario();
+}
+
+// --- PESTAÑA 1: VENDER (SOLO BOTÓN DE VENTA) ---
+function filtrarVentas() {
+    const texto = document.getElementById('buscador').value.toLowerCase();
+    const lista = productos.filter(p => p.nombre.toLowerCase().includes(texto));
+    renderizarVentas(lista);
+}
+
+function renderizarVentas(lista) {
+    const contenedor = document.getElementById('lista-ventas');
+    contenedor.innerHTML = "";
 
     lista.forEach(prod => {
         const div = document.createElement('div');
-        // Clase para alerta de stock bajo
-        const claseAlerta = prod.stock <= 5 ? "poca-existencia" : "";
-        div.className = `card ${claseAlerta}`;
-        
+        div.className = `card ${prod.stock <= 5 ? "poca-existencia" : ""}`;
         div.innerHTML = `
             <div class="producto-header">
                 <h3 class="nombre-prod">${prod.nombre}</h3>
                 <span class="precio-prod">C$ ${parseFloat(prod.precio).toFixed(2)}</span>
             </div>
             <div class="info-row">
-                <span class="stock-info">Stock: <strong>${prod.stock}</strong></span>
-                <button class="btn-vender" onclick="venderProducto(${prod.id})" ${prod.stock <= 0 ? 'disabled' : ''}>
+                <span style="font-size:1.2rem">Stock: <strong>${prod.stock}</strong></span>
+                <button class="btn-vender" onclick="vender(${prod.id})" ${prod.stock <= 0 ? 'disabled' : ''}>
                     ${prod.stock > 0 ? 'VENDER 1' : 'AGOTADO'}
                 </button>
             </div>
@@ -85,119 +97,159 @@ function renderizarLista(lista) {
     });
 }
 
-// --- LÓGICA DEL NEGOCIO ---
-
-function filtrarProductos() {
-    const texto = document.getElementById('buscador').value.toLowerCase();
-    const filtrados = productos.filter(p => 
-        p.nombre.toLowerCase().includes(texto)
-    );
-    renderizarLista(filtrados);
-}
-
-function venderProducto(id) {
+function vender(id) {
     const index = productos.findIndex(p => p.id === id);
-    if (index !== -1 && productos[index].stock > 0) {
-        productos[index].stock -= 1;
+    if (productos[index].stock > 0) {
+        productos[index].stock--;
         guardarEnLocal();
-        // Volver a filtrar para no perder la búsqueda actual
-        filtrarProductos(); 
+        filtrarVentas(); // Refrescar vista
     }
 }
 
+// --- PESTAÑA 2: INVENTARIO (EDICIÓN Y CORRECCIÓN) ---
+function filtrarInventario() {
+    const texto = document.getElementById('buscador-admin').value.toLowerCase();
+    const lista = productos.filter(p => p.nombre.toLowerCase().includes(texto));
+    renderizarInventario(lista);
+}
+
+function renderizarInventario(lista) {
+    const contenedor = document.getElementById('lista-inventario');
+    contenedor.innerHTML = "";
+
+    lista.forEach(prod => {
+        const div = document.createElement('div');
+        div.className = "card";
+        // Aquí agregamos los controles de + y - y el botón Editar
+        div.innerHTML = `
+            <div class="producto-header">
+                <h3 class="nombre-prod">${prod.nombre}</h3>
+                <button class="btn-editar" onclick="abrirModalEditar(${prod.id})">✏️ Editar</button>
+            </div>
+            <div style="text-align:right; color:#27ae60; font-weight:bold; margin-bottom:10px;">
+                Precio Actual: C$ ${prod.precio.toFixed(2)}
+            </div>
+            
+            <div class="admin-controls">
+                <button class="stock-control-btn btn-menos" onclick="ajustarStock(${prod.id}, -1)">-</button>
+                <span class="stock-display">${prod.stock}</span>
+                <button class="stock-control-btn btn-mas" onclick="ajustarStock(${prod.id}, 1)">+</button>
+            </div>
+            <p style="text-align:center; font-size:0.9rem; color:#777; margin-top:5px;">
+                Usa + y - para corregir cantidades
+            </p>
+        `;
+        contenedor.appendChild(div);
+    });
+}
+
+// Función mágica para corregir errores (+1 o -1)
+function ajustarStock(id, cantidad) {
+    const index = productos.findIndex(p => p.id === id);
+    if (index !== -1) {
+        const nuevoStock = productos[index].stock + cantidad;
+        if (nuevoStock >= 0) {
+            productos[index].stock = nuevoStock;
+            guardarEnLocal();
+            filtrarInventario(); // Refrescar solo esta vista
+        }
+    }
+}
+
+// --- MODALES (VENTANAS EMERGENTES) ---
+
+// 1. Modal Nuevo Producto
+function mostrarFormularioNuevo() {
+    document.getElementById('modal-nuevo').style.display = "block";
+}
+function cerrarModalNuevo() {
+    document.getElementById('modal-nuevo').style.display = "none";
+}
 function agregarProducto() {
     const nombre = document.getElementById('nuevo-nombre').value;
     const precio = parseFloat(document.getElementById('nuevo-precio').value);
     const stock = parseInt(document.getElementById('nuevo-stock').value);
 
-    if (nombre && precio && stock) {
-        const nuevoId = Date.now(); // ID único basado en la hora
-        productos.push({ id: nuevoId, nombre, precio, stock });
+    if (nombre && precio >= 0 && stock >= 0) {
+        productos.push({ id: Date.now(), nombre, precio, stock });
         guardarEnLocal();
+        cerrarModalNuevo();
+        filtrarInventario();
         alert("¡Producto agregado!");
-        
-        // Limpiar formulario
+        // Limpiar
         document.getElementById('nuevo-nombre').value = "";
         document.getElementById('nuevo-precio').value = "";
         document.getElementById('nuevo-stock').value = "";
     } else {
-        alert("Por favor llena todos los datos.");
+        alert("Revisa los datos por favor.");
     }
 }
 
-// --- UTILIDADES ---
-function mostrarPestana(id) {
-    document.querySelectorAll('.content').forEach(div => div.classList.remove('active'));
-    document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-    
-    document.getElementById(id).classList.add('active');
-    // Activar botón visualmente
-    event.target.classList.add('active');
-    
-    if(id === 'vender') filtrarProductos(); // Refrescar lista al volver
+// 2. Modal Editar Producto Existente
+function abrirModalEditar(id) {
+    const prod = productos.find(p => p.id === id);
+    if (prod) {
+        document.getElementById('edit-id').value = id;
+        document.getElementById('edit-nombre').value = prod.nombre;
+        document.getElementById('edit-precio').value = prod.precio;
+        document.getElementById('modal-editar').style.display = "block";
+    }
+}
+function cerrarModal() {
+    document.getElementById('modal-editar').style.display = "none";
 }
 
-function reiniciarFabrica() {
-    if(confirm("¿Estás seguro? Se borrarán todos los cambios y ventas.")) {
-        localStorage.removeItem('fym_inventario_v1');
-        location.reload();
+function guardarEdicion() {
+    const id = parseInt(document.getElementById('edit-id').value);
+    const nuevoNombre = document.getElementById('edit-nombre').value;
+    const nuevoPrecio = parseFloat(document.getElementById('edit-precio').value);
+
+    const index = productos.findIndex(p => p.id === id);
+    if (index !== -1 && nuevoNombre && nuevoPrecio >= 0) {
+        productos[index].nombre = nuevoNombre;
+        productos[index].precio = nuevoPrecio;
+        guardarEnLocal();
+        cerrarModal();
+        filtrarInventario(); // Actualizar la lista
+    } else {
+        alert("Datos inválidos");
     }
+}
+
+// --- PDF Y UTILIDADES ---
+async function descargarPDF() {
+    if (!window.jspdf) { alert("Conecta a internet para generar el PDF"); return; }
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+    doc.text("Inventario Farmacia F&M", 14, 20);
+    doc.text("Fecha: " + new Date().toLocaleDateString(), 14, 28);
+    
+    const filas = productos.map(p => [p.nombre, p.precio.toFixed(2), p.stock]);
+    doc.autoTable({
+        head: [["Producto", "Precio", "Stock"]],
+        body: filas,
+        startY: 35,
+    });
+    doc.save("Inventario.pdf");
 }
 
 function descargarRespaldo() {
     const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(productos));
-    const downloadAnchorNode = document.createElement('a');
-    downloadAnchorNode.setAttribute("href", dataStr);
-    downloadAnchorNode.setAttribute("download", "inventario_f&m.json");
-    document.body.appendChild(downloadAnchorNode);
-    downloadAnchorNode.click();
-    downloadAnchorNode.remove();
+    const a = document.createElement('a');
+    a.href = dataStr;
+    a.download = "respaldo_farmacia.json";
+    a.click();
 }
 
-// --- FUNCIÓN PARA DESCARGAR PDF ---
-async function descargarPDF() {
-    // Verificar si la librería cargó correctamente
-    if (!window.jspdf) {
-        alert("Error: No se cargó la librería de PDF. Revisa tu conexión a internet.");
-        return;
+function reiniciarFabrica() {
+    if(confirm("¿SEGURO? Se borrará todo.")) {
+        localStorage.removeItem('fym_inventario_v3');
+        location.reload();
     }
+}
 
-    const { jsPDF } = window.jspdf;
-    const doc = new jsPDF();
-
-    // 1. Título y Fecha
-    doc.setFontSize(18);
-    doc.text("Inventario F&M", 14, 20);
-    
-    doc.setFontSize(11);
-    doc.setTextColor(100);
-    const fecha = new Date().toLocaleDateString('es-NI', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
-    doc.text("Generado el: " + fecha, 14, 28);
-
-    // 2. Preparar los datos para la tabla
-    // Convertimos el array de objetos a un array de arrays (filas)
-    const columnas = ["Producto", "Precio (C$)", "Stock"];
-    const filas = productos.map(p => [
-        p.nombre,
-        p.precio.toFixed(2),
-        p.stock
-    ]);
-
-    // 3. Generar la tabla usando autoTable
-    doc.autoTable({
-        head: [columnas],
-        body: filas,
-        startY: 35, // Empezar debajo del título
-        theme: 'grid', // Estilo de rejilla
-        headStyles: { fillColor: [44, 62, 80] }, // Color del encabezado (mismo azul que la app)
-        styles: { fontSize: 10 },
-        columnStyles: {
-            0: { cellWidth: 'auto' }, // Nombre ancho auto
-            1: { halign: 'right' },   // Precio alineado derecha
-            2: { halign: 'center' }   // Stock centrado
-        }
-    });
-
-    // 4. Guardar archivo
-    doc.save(`Inventario_FyM_${new Date().toISOString().slice(0,10)}.pdf`);
+// Cerrar modales si tocan fuera
+window.onclick = function(event) {
+    if (event.target == document.getElementById('modal-editar')) cerrarModal();
+    if (event.target == document.getElementById('modal-nuevo')) cerrarModalNuevo();
 }
