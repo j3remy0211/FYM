@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Farmacia F&M</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <header>
+        <h1>F&M</h1>
+    </header>
+
+    <div class="tabs">
+        <button class="tab-btn active" onclick="mostrarPestana('vender')">🛒 VENDER</button>
+        <button class="tab-btn" onclick="mostrarPestana('admin')">📋 INVENTARIO</button>
+    </div>
+
+    <div id="vender" class="content active">
+        <div class="search-container">
+            <input type="text" id="buscador" placeholder="🔍 Buscar medicina..." onkeyup="filtrarProductos()">
+        </div>
+        
+        <div id="lista-productos">
+            </div>
+    </div>
+
+    <div id="admin" class="content">
+        <div class="card form-card">
+            <h3>➕ Nuevo Producto</h3>
+            <input type="text" id="nuevo-nombre" placeholder="Nombre del producto">
+            <div class="row">
+                <input type="number" id="nuevo-precio" placeholder="Precio C$">
+                <input type="number" id="nuevo-stock" placeholder="Cantidad">
+            </div>
+            <button onclick="agregarProducto()" class="btn-guardar">GUARDAR NUEVO</button>
+        </div>
+
+        <div class="acciones-extra">
+            <h3>⚙️ Opciones</h3>
+            <p>Los datos se guardan en este dispositivo.</p>
+            
+            <button onclick="descargarPDF()" class="btn-pdf">📄 Descargar Inventario PDF</button>
+            <br><br>
+            
+            <button onclick="descargarRespaldo()" class="btn-secundario">⬇️ Descargar Respaldo JSON</button>
+            <br><br>
+            <button onclick="reiniciarFabrica()" class="btn-peligro">⚠️ Reiniciar Inventario Original</button>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
+</body>
+</html>
